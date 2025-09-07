@@ -11,4 +11,5 @@ class Supplier extends Model
         return $this->hasMany(LineItem::class);
     }
     
+    
 }
