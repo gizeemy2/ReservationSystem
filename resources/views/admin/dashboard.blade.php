@@ -95,16 +95,16 @@
       <a class="nav-link active" href="{{ route('admin.dashboard') }}">
         <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
       </a>
-      <a class="nav-link" href="#">
+      <a class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}" href="{{ route('admin.customers.index') }}">
         <i class="bi bi-people"></i> Müşteriler
       </a>
-      <a class="nav-link" href="#">
+      <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}" href="{{ route('admin.suppliers.index') }}">
         <i class="bi bi-building"></i> Tedarikçiler
       </a>
-      <a class="nav-link" href="#">
+      <a class="nav-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}" href="{{ route('admin.reservations.index') }}">
         <i class="bi bi-card-checklist"></i> Rezervasyonlar
       </a>
-      <a class="nav-link" href="#">
+      <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
         <i class="bi bi-receipt"></i> Ödemeler
       </a>
     </div>

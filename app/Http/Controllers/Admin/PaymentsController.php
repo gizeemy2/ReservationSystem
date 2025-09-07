@@ -4,62 +4,56 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Payment; 
+use App\Models\Reservation;
+use App\Models\Customer;
 
 class PaymentsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index(Request $r){
+        $q = trim($r->get('q',''));
+        $payments = Payment::with('reservation')
+            ->when($q, fn($qr)=>$qr->where('reference','like',"%$q%"))
+            ->latest('id')->paginate(10)->withQueryString();
+        return view('admin.payments.index', compact('payments','q'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
-    }
+        $reservations = Reservation::orderBy('id', 'desc')->get();
+        $customers = Customer::orderBy('first_name')->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        return view('admin.payments.create', compact('reservations', 'customers'));
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    public function store(Request $r){
+        $data = $r->validate([
+            'reservation_id'=>['required','exists:reservations,id'],
+            'amount_usd'    =>['required','numeric','min:0'],
+            'method'        =>['required','in:cash,card,wire,other'],
+            'paid_at'       =>['required','date'],
+            'reference'     =>['nullable','string','max:255'],
+            'notes'         =>['nullable','string'],
+        ]);
+        Payment::create($data);
+        return redirect()->route('admin.payments.index')->with('status','Ödeme eklendi.');
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    public function edit(Payment $payment){
+        $reservations = Reservation::latest('id')->get(['id','code']);
+        return view('admin.payments.edit', compact('payment','reservations'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(Request $r, Payment $payment){
+        $data = $r->validate([
+            'reservation_id'=>['required','exists:reservations,id'],
+            'amount_usd'    =>['required','numeric','min:0'],
+            'method'        =>['required','in:cash,card,wire,other'],
+            'paid_at'       =>['required','date'],
+            'reference'     =>['nullable','string','max:255'],
+            'notes'         =>['nullable','string'],
+        ]);
+        $payment->update($data);
+        return redirect()->route('admin.payments.index')->with('status','Ödeme güncellendi.');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(Payment $payment){
+        $payment->delete();
+        return back()->with('status','Ödeme silindi.');
     }
 }

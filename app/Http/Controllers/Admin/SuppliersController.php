@@ -4,62 +4,59 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Supplier; 
 
 class SuppliersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $r)
     {
-        //
+        $q = trim($r->get('q',''));
+        $suppliers = Supplier::query()
+            ->when($q, fn($qr)=>$qr->where('name','like',"%$q%")->orWhere('email','like',"%$q%"))
+            ->latest('id')->paginate(10)->withQueryString();
+
+        return view('admin.suppliers.index', compact('suppliers','q'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        // create view'a $supplier GÖNDERME!
+        return view('admin.suppliers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $r)
     {
-        //
+        $data = $r->validate([
+            'name'  => ['required','string','max:255'],
+            'email' => ['nullable','email','max:255'],
+            'phone' => ['nullable','string','max:255'],
+        ]);
+
+        Supplier::create($data);
+        return redirect()->route('admin.suppliers.index')->with('status','Tedarikçi oluşturuldu.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Supplier $supplier) // <-- route model binding
     {
-        //
+        // BURASI KRİTİK: edit view'a $supplier gönder
+        return view('admin.suppliers.edit', compact('supplier'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $r, Supplier $supplier)
     {
-        //
+        $data = $r->validate([
+            'name'  => ['required','string','max:255'],
+            'email' => ['nullable','email','max:255'],
+            'phone' => ['nullable','string','max:255'],
+        ]);
+
+        $supplier->update($data);
+        return redirect()->route('admin.suppliers.index')->with('status','Tedarikçi güncellendi.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Supplier $supplier)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $supplier->delete();
+        return back()->with('status','Tedarikçi silindi.');
     }
 }

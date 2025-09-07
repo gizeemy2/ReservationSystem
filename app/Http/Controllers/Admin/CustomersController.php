@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer; // Model adı Customer olsun
 use Illuminate\Http\Request;
 
+
 class CustomersController extends Controller
 {
     public function index(Request $request)
