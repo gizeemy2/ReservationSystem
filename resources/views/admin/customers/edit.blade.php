@@ -36,10 +36,11 @@
   </div>
   <div class="col-md-6">
     <label class="form-label">Segment</label>
-    @php $segments=['res_standard','res_premium','heb_standard']; @endphp
+    @php $segments = ['GZM STANDART' => 'Standart', 'GZM PREMIUM' => 'Premium']; @endphp
+
     <select name="segment" class="form-select" required>
-      @foreach ($segments as $s)
-        <option value="{{ $s }}" @selected(old('segment',$customer->segment)==$s)>{{ $s }}</option>
+      @foreach ($segments as $val => $label)
+        <option value="{{ $val }}" @selected(old('segment', $customer->segment ?? '') == $val)>{{ $label }}</option>
       @endforeach
     </select>
   </div>

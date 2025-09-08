@@ -15,7 +15,6 @@
   <div class="alert alert-success">{{ session('status') }}</div>
 @endif
 
-{{-- Arama --}}
 <form method="GET" class="mb-3">
   <div class="input-group">
     <span class="input-group-text"><i class="bi bi-search"></i></span>

@@ -1,4 +1,4 @@
-@extends('admin.layout') {{-- basit bir layout önerdim; yoksa <html> tam sayfa yazabilirim --}}
+@extends('admin.layout') 
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">

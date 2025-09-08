@@ -18,23 +18,26 @@ class ReservationsController extends Controller
         return view('admin.reservations.index', compact('reservations','q'));
     }
     public function create()
-{
-    $customers = Customer::orderBy('first_name')->get();
-
-    return view('admin.reservations.create', compact('customers'));
-}
-    public function store(Request $r){
-        $data = $r->validate([
-            'customer_id'=>['required','exists:customers,id'],
-            'start_date' =>['nullable','date'],
-            'end_date'   =>['nullable','date','after_or_equal:start_date'],
-            'status'     =>['required','in:draft,pending,confirmed,cancelled'],
-            'code'       =>['nullable','string','max:255'],
-            'notes'      =>['nullable','string'],
-        ]);
-        Reservation::create($data);
-        return redirect()->route('admin.reservations.index')->with('status','Rezervasyon oluşturuldu.');
+    {
+        $customers = Customer::orderBy('first_name')->get();    
+        return view('admin.reservations.create', compact('customers'));
     }
+
+    public function store(Request $request)
+    {
+        Reservation::create([
+            'customer_id' => $request->customer_id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+            'note' => $request->note, // <-- BU SATIR OLMALI
+            'code'        => uniqid('RSV-'), // ← kod otomatik oluşturulabilir
+        ]);
+    
+        return redirect()->route('admin.reservations.index')->with('success', 'Rezervasyon oluşturuldu.');
+    }
+    
+
     public function edit(Reservation $reservation){
         $customers = Customer::orderBy('first_name')->get(['id','first_name','last_name']);
         return view('admin.reservations.edit', compact('reservation','customers'));
@@ -46,7 +49,7 @@ class ReservationsController extends Controller
             'end_date'   =>['nullable','date','after_or_equal:start_date'],
             'status'     =>['required','in:draft,pending,confirmed,cancelled'],
             'code'       =>['nullable','string','max:255'],
-            'notes'      =>['nullable','string'],
+            'note'      =>['nullable','string'],
         ]);
         $reservation->update($data);
         return redirect()->route('admin.reservations.index')->with('status','Rezervasyon güncellendi.');

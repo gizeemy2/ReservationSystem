@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin Dashboard</title>
 
-  {{-- Bootstrap 5 + Icons --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -79,7 +78,6 @@
 <body>
 
 <div class="layout">
-  {{-- SIDEBAR --}}
   <aside id="sidebar" class="sidebar">
     <div class="brand">
       <div class="logo">A</div>
@@ -125,12 +123,9 @@
     </div>
   </aside>
 
-  {{-- MOBILE BACKDROP --}}
   <div id="backdrop" class="backdrop" onclick="toggleSidebar(false)"></div>
 
-  {{-- CONTENT --}}
   <section class="content">
-    {{-- TOP BAR --}}
     <div class="topbar">
       <div class="d-flex align-items-center gap-2">
         <button class="btn btn-outline-secondary d-lg-none" onclick="toggleSidebar(true)">
@@ -152,9 +147,7 @@
       </div>
     </div>
 
-    {{-- MAIN --}}
     <main class="container-fluid py-4">
-      {{-- Stats --}}
       <div class="row g-3">
         <div class="col-12 col-md-6 col-xl-3">
           <div class="card shadow-sm border-0 rounded-4 stat-card">
@@ -162,8 +155,8 @@
               <span class="btn btn-light rounded-3"><i class="bi bi-people"></i></span>
               <div>
                 <div class="small muted">Toplam Müşteri</div>
-                <div class="fs-4 fw-semibold">1,248</div>
-              </div>
+                <div class="fs-4 fw-semibold">{{ $totalCustomers }}</div>
+            </div>
             </div>
           </div>
         </div>
@@ -173,8 +166,8 @@
               <span class="btn btn-light rounded-3"><i class="bi bi-card-checklist"></i></span>
               <div>
                 <div class="small muted">Aktif Rezervasyon</div>
-                <div class="fs-4 fw-semibold">86</div>
-              </div>
+                {{ $activeReservations }}
+            </div>
             </div>
           </div>
         </div>
@@ -184,8 +177,8 @@
               <span class="btn btn-light rounded-3"><i class="bi bi-cash-coin"></i></span>
               <div>
                 <div class="small muted">Aylık Gelir (USD)</div>
-                <div class="fs-4 fw-semibold">$12,430</div>
-              </div>
+                <div class="fs-4 fw-semibold">${{ number_format($monthlyRevenue, 2) }}</div>
+            </div>
             </div>
           </div>
         </div>
@@ -195,27 +188,27 @@
               <span class="btn btn-light rounded-3"><i class="bi bi-activity"></i></span>
               <div>
                 <div class="small muted">Dönüşüm</div>
-                <div class="fs-4 fw-semibold">4.3%</div>
-              </div>
+                <div class="fs-4 fw-semibold">{{ $conversionRate }}%</div>
+            </div>
             </div>
           </div>
         </div>
       </div>
 
-      {{-- Quick actions --}}
       <div class="card shadow-sm border-0 rounded-4 mt-4">
         <div class="card-body d-flex flex-wrap gap-2">
-          <a href="#" class="btn btn-grad"><i class="bi bi-plus-lg me-1"></i> Yeni Rezervasyon</a>
-          <a href="#" class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i> Dosya Yükle</a>
-          <a href="#" class="btn btn-outline-secondary"><i class="bi bi-download me-1"></i> İndir</a>
+           <a href="{{ route('admin.reservations.create') }}" class="btn btn-grad">
+                <i class="bi bi-plus-lg me-1"></i> Yeni Rezervasyon
+            </a>
+           <a href="#" class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i> Dosya Yükle</a>
+           <a href="#" class="btn btn-outline-secondary"><i class="bi bi-download me-1"></i> İndir</a>
         </div>
       </div>
 
-      {{-- Latest reservations (table demo) --}}
       <div class="card shadow-sm border-0 rounded-4 mt-4">
         <div class="card-header bg-white d-flex align-items-center justify-content-between">
           <span class="fw-semibold">Son Rezervasyonlar</span>
-          <a href="#" class="btn btn-sm btn-outline-secondary">Tümünü Gör</a>
+          <a href="{{ route('admin.reservations.index') }}" class="btn btn-sm btn-outline-secondary">Tümünü Gör</a>
         </div>
         <div class="table-responsive">
           <table class="table align-middle mb-0">
@@ -223,38 +216,37 @@
               <tr>
                 <th>#</th>
                 <th>Müşteri</th>
-                <th>Tür</th>
                 <th>Tarih</th>
                 <th>Tutar (USD)</th>
                 <th class="text-end">Durum</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>RSV-1024</td>
-                <td>Jane Cooper</td>
-                <td>Hotel</td>
-                <td>2025-09-06</td>
-                <td>1,120</td>
-                <td class="text-end"><span class="badge text-bg-success">Onaylandı</span></td>
-              </tr>
-              <tr>
-                <td>RSV-1023</td>
-                <td>Wade Warren</td>
-                <td>Flight</td>
-                <td>2025-09-05</td>
-                <td>780</td>
-                <td class="text-end"><span class="badge text-bg-warning">Beklemede</span></td>
-              </tr>
-              <tr>
-                <td>RSV-1022</td>
-                <td>Jacob Jones</td>
-                <td>Tour</td>
-                <td>2025-09-04</td>
-                <td>340</td>
-                <td class="text-end"><span class="badge text-bg-secondary">Taslak</span></td>
-              </tr>
-            </tbody>
+                @forelse ($recentReservations as $reservation)
+                  <tr>
+                    <td>{{ 'RSV-' . str_pad($reservation->id, 4, '0', STR_PAD_LEFT) }}</td>
+                    <td>{{ $reservation->customer->first_name }} {{ $reservation->customer->last_name }}</td>
+                    <td>{{ \Carbon\Carbon::parse($reservation->start_date)->format('Y-m-d') }}</td>
+                    <td>${{ number_format($reservation->total_amount ?? 0, 2) }}</td>
+                    <td class="text-end">
+                      @php
+                        $badgeClass = match($reservation->status) {
+                          'confirmed' => 'success',
+                          'pending' => 'warning',
+                          'cancelled' => 'danger',
+                          default => 'secondary',
+                        };
+                      @endphp
+                      <span class="badge text-bg-{{ $badgeClass }}">{{ ucfirst($reservation->status) }}</span>
+                    </td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="6">Rezervasyon bulunamadı.</td>
+                  </tr>
+                @endforelse
+              </tbody>
+              
           </table>
         </div>
       </div>

@@ -42,7 +42,7 @@ class CustomersController extends Controller
             'tc_no'       => ['nullable','string','max:255'],
             'gender'      => ['nullable','in:male,female,other'],
             'dob'         => ['nullable','date'],
-            'segment'     => ['required','in:res_premium,res_standard,heb_standard'], // enum’unla uyumlu tut
+            'segment' => ['required','in:GZM PREMIUM,GZM STANDART'],
         ]);
 
         Customer::create($data);
@@ -66,7 +66,7 @@ class CustomersController extends Controller
             'tc_no'       => ['nullable','string','max:255'],
             'gender'      => ['nullable','in:male,female,other'],
             'dob'         => ['nullable','date'],
-            'segment'     => ['required','in:res_premium,res_standard,heb_standard'],
+            'segment'     => ['required','in:GZM PREMIUM,GZM STANDART'],
         ]);
 
         $customer->update($data);

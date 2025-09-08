@@ -20,7 +20,7 @@ Route::prefix('admin')->name('admin.')->middleware('guest')->group(function () {
 // ---------------- GİRİŞ YAPANLAR (auth) ----------------
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.dashboard'));
-    Route::get('dashboard', fn () => view('admin.dashboard'))->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
@@ -31,7 +31,6 @@ Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
 
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-    // ... mevcut dashboard & logout rotaların
 
     Route::resource('customers', CustomersController::class)->except(['show']);
     Route::resource('suppliers', SuppliersController::class)->except(['show']);

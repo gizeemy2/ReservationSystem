@@ -1,4 +1,3 @@
-{{-- resources/views/admin/suppliers/create.blade.php --}}
 @extends('admin.layout')
 
 @section('title','Yeni Tedarikçi')
